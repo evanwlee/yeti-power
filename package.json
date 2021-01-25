@@ -1,0 +1,56 @@
+{
+  "name": "yeti",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@network-utils/arp-lookup": "^1.3.4",
+    "@testing-library/jest-dom": "^5.11.8",
+    "@testing-library/react": "^11.2.2",
+    "@testing-library/user-event": "^12.6.0",
+    "arpping": "^2.0.0",
+    "bootstrap": "^4.5.3",
+    "camel-case": "^4.1.2",
+    "capital-case": "^1.0.4",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "epilogue": "^0.7.1",
+    "express": "^4.17.1",
+    "install": "^0.13.0",
+    "jquery": "^3.5.1",
+    "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.6",
+    "npm-run-all": "^4.1.5",
+    "react": "^17.0.1",
+    "react-bootstrap": "^1.4.3",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.1",
+    "web-vitals": "^0.2.4"
+  },
+  "scripts": {
+    "start": "npm-run-all --parallel watch:server start:web",
+    "start:web": "react-scripts start",
+    "start:server": "node src/server",
+    "watch:server": "nodemon --watch src/server src/server",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
