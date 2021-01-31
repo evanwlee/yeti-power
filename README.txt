@@ -2,11 +2,12 @@ Simple homebrew single page application and corresponding services to monitor Go
 and trigger remote start generator.
 
 Primary technologies:
-NodeJS
-React
-Express 
-Shell script
-Python
+nodeJS
+react
+bootstrap
+express 
+shell script
+python
 
 Hardware required:
 Raspberry Pi 
