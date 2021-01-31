@@ -9,9 +9,10 @@ express
 shell script
 python
 
-Hardware required:
-Raspberry Pi 
-433 MHZ TX/RX
+Hardware required (see physical component diagram):
+Raspberry Pi with 433 MHZ TX/RX
+Remote start generator
+IoT Enable Portable Solar Generator
 
 
 Uses transmission on 433mhz to remotely control auto-start generator.
