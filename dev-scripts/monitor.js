@@ -13,6 +13,9 @@ if(chargeStopPercent > 100){
 	chargeStopPercent = 100;
 }
 
+var x = 0;
+var intervalID = null;
+
 function getStatus() {
 
 	fetch(`http://${apiHostIp}/api/searchIP`)
@@ -68,16 +71,7 @@ function handleStatus(stateData){
 
 		if( command !== ''){
 			console.log('Running command: '+command);
-			exec(command, (error, stdout, stderr) => {
-				if (error) {
-					console.log(`error: ${error.message}`);
-					return;
-				}
-				if (stderr) {
-					console.log(`Result ${stderr}`);
-				}
-				//console.log(`stdout: ${stdout}`);
-			});
+			intervalID = setInterval(callMe(command), 1000);
 		}else{
 			console.log(`Nothing More To Do.`);
 		}
@@ -87,4 +81,21 @@ function handleStatus(stateData){
 }
 
 
+function callMe(command){
+
+       if (++x === repetitions) {
+           clearInterval(intervalID);
+       }else{
+	exec(command, (error, stdout, stderr) => {
+				if (error) {
+					console.log(`error: ${error.message}`);
+					return;
+				}
+				if (stderr) {
+					console.log(`Result ${stderr}`);
+				}
+				//console.log(`stdout: ${stdout}`);
+			});
+       }
+}
 getStatus();
