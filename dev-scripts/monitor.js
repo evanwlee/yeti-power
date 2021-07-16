@@ -12,6 +12,10 @@ if (chargeStopPercent > 100)
 	chargeStopPercent = 100;
 }
 
+//Only run generator in defined time window
+let windowStart = '08:00:10';
+let windowEnd = '21:30:00';
+
 let x = 0;
 let xy = 0;
 const generatorCommandRepetitions = 8;//once every second
@@ -25,43 +29,43 @@ let desiredState = null;
 let command = '';
 let commandShort = '';
 
+const logging = true;
+
 function getStatus()
 {
-	console.log('\nStarting Power Status Check @ ' + new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-	console.log('Doing up to ' +statusRepetitions+' status checks. One every '+statusCheckPause+' second(s).');
-	console.log('If required, doing ' +generatorCommandRepetitions+' generator command attempts. One every '+generatorCommandPause+' second(s).');
-	console.log('Minimum state of charge percent is ' + chargeLowerThreshold+'%. This indicates when to start generator.');
-	console.log('Max state of charge percent is ' + chargeStopPercent +'%. This indicates when to stop generator.');
-	console.log('\n\n');
+	printDetails();
 	statusIntervalId = setInterval(robustCheck, (statusCheckPause*1000));
 }
 
 function handleStatus(stateData)
 {
-	console.log('\n'+xy+') Checking Power Status - ' + new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-
+	out('\n'+xy+') Checking Power Status - ' + new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
 
 	const commandOn = `/usr/bin/python3 ${sendScript} -p 384 6302497`;
 	const commandOff = `/usr/bin/python3 ${sendScript} -p 384 6302498`;
 
 	if (typeof stateData !== 'undefined' && stateData.socPercent !== 'undefined')
 	{
-		console.log('State of Charge = ' + stateData.socPercent + '%');
-		console.log('Charging Status = ' + (Boolean(stateData.isCharging) ? "Charging":"Not Charging"));
-		console.log('');
+		out('State of Charge = ' + stateData.socPercent + '%');
+		out('Charging Status = ' + (Boolean(stateData.isCharging) ? "Charging":"Not Charging"));
+		out('');
 
 		if (stateData.socPercent < chargeLowerThreshold)
 		{
 			//if charge is below threshold send on command to start Gen, if not already charging
 			if (stateData.isCharging === 0)
 			{
-				console.log('Turn ON with ' + commandOn);
-				commandShort = 'ON';
-				command = commandOn;
+				if(canRunBasedOnTimeOfDay(windowStart,windowEnd)){
+					out('Turn ON with ' + commandOn);
+					commandShort = 'ON';
+					command = commandOn;
+				}else{
+					out('Not starting because we are outside of run window.');
+				}
 			}
 			else
 			{
-				console.log('Already charging, no need to start Generator.');
+				out('Already charging, no need to start Generator.');
 			}
 		}
 		else if (stateData.socPercent >= chargeStopPercent)
@@ -69,18 +73,18 @@ function handleStatus(stateData)
 			//if charge is above threshold send off command, if charging
 			if (stateData.isCharging === 1)
 			{
-				console.log('Turn OFF with ' + commandOff);
+				out('Turn OFF with ' + commandOff);
 				commandShort = 'OFF';
 				command = commandOff;
 			}
 			else
 			{
-				console.log('Generator is already stopped.');
+				out('Generator is already stopped.');
 			}
 		}
 		else
 		{
-			console.log('Charge level within threshold.');
+			out('Charge level within threshold.');
 		}
 
 		if (command !== '')
@@ -90,31 +94,26 @@ function handleStatus(stateData)
 		else
 		{
 			desiredState = stateData.isCharging;
-			console.log(`Nothing More To Do.`);
+			out(`Nothing More To Do.`);
 		}
-
 	}
-
 }
 
 function robustCheck()
 {
 	if (++xy === ( statusRepetitions + 1) || desiredState !== null)
 	{
-
-		console.log('\n');
+		out('\n');
 		if(desiredState === null && xy > 0){
-			console.log('Completed the maximum number of status checks ('+statusRepetitions+').');
-			console.log(' ** WARNING: It appears that the '+commandShort+' command probably FAILED.');
+			out('Completed the maximum number of status checks ('+statusRepetitions+').');
+			out(' ** WARNING: It appears that the '+commandShort+' command probably FAILED.');
 		}else if(desiredState !== null){
-			console.log('Generator is in desired state or completed the maximum number of status checks ('+statusRepetitions+').');
-			console.log(' ** SUCCESS: It appears that the '+commandShort+' command probably SUCCEEDED.');
+			out('Generator is in desired state or completed the maximum number of status checks ('+statusRepetitions+').');
+			out(' ** SUCCESS: It appears that the '+commandShort+' command probably SUCCEEDED.');
 		}
-		console.log('Done.');
+		out('Done.');
 		xy = 0;
 		clearInterval(statusIntervalId);
-
-
 	}
 	else
 	{
@@ -137,7 +136,7 @@ function robustCheck()
 			})
 			.then((data) => handleStatus(data))
 			.catch(error => {
-				console.log('Not able to get status from Yeti' + error);
+				out('Not able to get status from Yeti' + error);
 			});
 		;
 	}
@@ -145,28 +144,62 @@ function robustCheck()
 
 function doCommand()
 {
-
 	if (++x === (generatorCommandRepetitions +1 ))
 	{
-		console.log('Maximum number of '+commandShort+' commands attempted ('+generatorCommandRepetitions+')');
+		out('Maximum number of '+commandShort+' commands attempted ('+generatorCommandRepetitions+')');
 		x = 0;
 		clearInterval(intervalID);
 	}
 	else
 	{
-		console.log(x+' - Running command: ' + command);
+		out(x+' - Running command: ' + command);
 		exec(command, (error, stdout, stderr) => {
 			if (error)
 			{
-				console.log(`error: ${error.message}`);
+				out(`error: ${error.message}`);
 				return;
 			}
 			if (stderr)
 			{
-				console.log(`Result ${stderr}`);
+				out(`Result ${stderr}`);
 			}
-			//console.log(`stdout: ${stdout}`);
 		});
+	}
+}
+
+function canRunBasedOnTimeOfDay(startTime,endTime){
+
+	let currentDate = new Date()
+
+	let startDate = new Date(currentDate.getTime());
+	startDate.setHours(startTime.split(":")[0]);
+	startDate.setMinutes(startTime.split(":")[1]);
+	startDate.setSeconds(startTime.split(":")[2]);
+
+	let endDate = new Date(currentDate.getTime());
+	endDate.setHours(endTime.split(":")[0]);
+	endDate.setMinutes(endTime.split(":")[1]);
+	endDate.setSeconds(endTime.split(":")[2]);
+
+
+	return startDate < currentDate && endDate > currentDate
+}
+
+function printDetails(){
+	if( logging ) {
+		out('\nStarting Power Status Check @ ' + new Date().toLocaleString('en-US', {timeZone: 'America/Los_Angeles'}));
+		out('Doing up to ' + statusRepetitions + ' status checks. One every ' + statusCheckPause + ' second(s).');
+		out('If required, doing ' + generatorCommandRepetitions + ' generator command attempts. One every ' + generatorCommandPause + ' second(s).');
+		out('Minimum state of charge percent is ' + chargeLowerThreshold + '%. This indicates when to start generator.');
+		out('Max state of charge percent is ' + chargeStopPercent + '%. This indicates when to stop generator.');
+		out('Run window is ' + windowStart + ' to' + windowEnd + '.');
+		out('\n\n');
+	}
+}
+
+function out(msg){
+	if( logging ){
+		console.log(msg);
 	}
 }
 
