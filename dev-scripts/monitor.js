@@ -109,7 +109,9 @@ function robustCheck()
 			out(' ** WARNING: It appears that the '+commandShort+' command probably FAILED.');
 		}else if(desiredState !== null){
 			out('Generator is in desired state or completed the maximum number of status checks ('+statusRepetitions+').');
-			out(' ** SUCCESS: It appears that the '+commandShort+' command probably SUCCEEDED.');
+			if( commandShort !== '' ){
+				out(' ** SUCCESS: It appears that the '+commandShort+' command probably SUCCEEDED.');
+			}
 		}
 		out('Done.');
 		xy = 0;
