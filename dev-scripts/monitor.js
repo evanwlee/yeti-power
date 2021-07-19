@@ -192,7 +192,7 @@ function printDetails(){
 		out('If required, doing ' + generatorCommandRepetitions + ' generator command attempts. One every ' + generatorCommandPause + ' second(s).');
 		out('Minimum state of charge percent is ' + chargeLowerThreshold + '%. This indicates when to start generator.');
 		out('Max state of charge percent is ' + chargeStopPercent + '%. This indicates when to stop generator.');
-		out('Run window is ' + windowStart + ' to' + windowEnd + '.');
+		out('Run window is ' + windowStart + ' to ' + windowEnd + '.');
 		out('\n\n');
 	}
 }
