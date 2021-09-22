@@ -4,7 +4,10 @@ import React from "react";
 import { capitalCase } from "capital-case";
 import Modal from 'react-bootstrap/Modal';
 
-const apiHostIp = '192.168.1.195:3001';
+//const apiHostIp = '192.168.42.100:3001';
+//const apiHostIp = '192.168.1.195:3001';
+const ip = window.location.hostname;
+const apiHostIp= ip + ':3001';
 
 
 class Yeti extends React.Component {
