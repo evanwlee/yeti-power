@@ -15,8 +15,8 @@ const remote_server = {
 
 let url = "http://evanwlee.sarse.com/cabin/command.json";
 let sendScript = '/home/ewl_1975/yeti/dev-scripts/python/send.py';
-const commandOn = `/usr/bin/python3 ${sendScript} -p 384 6302497`;
-const commandOff = `/usr/bin/python3 ${sendScript} -p 384 6302498`;
+const commandOn = `/usr/bin/python3 ${sendScript} -p 385 6302497`;
+const commandOff = `/usr/bin/python3 ${sendScript} -p 385 6302498`;
 
 //how many times to run the command
 let generatorCommandRepetitions = 20;
