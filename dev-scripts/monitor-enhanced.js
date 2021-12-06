@@ -31,8 +31,8 @@ let commandShort = '';
 
 const logging = true;
 
-const commandOn = `/usr/bin/python3 ${sendScript} -p 384 6302497`;
-const commandOff = `/usr/bin/python3 ${sendScript} -p 384 6302498`;
+const commandOn = `/usr/bin/python3 ${sendScript} -p 385 6302497`;
+const commandOff = `/usr/bin/python3 ${sendScript} -p 385 6302498`;
 
 function getStatus()
 {
