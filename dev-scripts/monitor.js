@@ -41,8 +41,8 @@ function handleStatus(stateData)
 {
 	out('\n'+xy+') Checking Power Status - ' + new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
 
-	const commandOn = `/usr/bin/python3 ${sendScript} -p 384 6302497`;
-	const commandOff = `/usr/bin/python3 ${sendScript} -p 384 6302498`;
+	const commandOn = `/usr/bin/python3 ${sendScript} -p 385 6302497`;
+	const commandOff = `/usr/bin/python3 ${sendScript} -p 385 6302498`;
 
 	if (typeof stateData !== 'undefined' && stateData.socPercent !== 'undefined')
 	{
